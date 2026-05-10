@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>វិញ្ញាសាត្រីកោណមាត្រស្តង់ដារ</title>
+    
+    <!-- MathJax for Professional Math Rendering -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <!-- Khmer Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Khmer+OS+Muol+Light&family=Kantumruy+Pro:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-blue: #1e40af;
+            --border-color: #cbd5e1;
+            --bg-light: #f8fafc;
+        }
+
+        body {
+            font-family: 'Kantumruy Pro', sans-serif;
+            background-color: #e2e8f0;
+            margin: 0;
+            padding: 20px;
+            color: #1e293b;
+        }
+
+        .exam-paper {
+            max-width: 850px;
+            margin: 0 auto;
+            background: white;
+            padding: 50px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            position: relative;
+        }
+
+        /* Exam Header Standard */
+        .exam-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+        }
+
+        .school-info {
+            text-align: center;
+            font-family: 'Khmer OS Muol Light', serif;
+            font-size: 14px;
+        }
+
+        .exam-title {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .exam-title h2 {
+            font-family: 'Khmer OS Muol Light', serif;
+            font-size: 18px;
+            color: var(--primary-blue);
+            margin-bottom: 5px;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            background: var(--bg-light);
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        /* Sticky Timer & Progress */
+        .sticky-status {
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+            background: white;
+            padding: 10px 20px;
+            border: 2px solid var(--primary-blue);
+            border-radius: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .progress-container {
+            flex-grow: 1;
+            height: 10px;
+            background: #e2e8f0;
+            margin: 0 20px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--primary-blue);
+            transition: width 0.3s;
+        }
+
+        /* Question Styling */
+        .question-block {
+            margin-bottom: 35px;
+            padding: 20px;
+            border-left: 4px solid var(--primary-blue);
+            background: #fff;
+        }
+
+        .q-text {
+            font-weight: 700;
+            font-size: 17px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .points-badge {
+            color: #059669;
+            font-size: 14px;
+            font-weight: normal;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .option-item {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .option-item:hover {
+            background: #f1f5ff;
+            border-color: var(--primary-blue);
+        }
+
+        .option-item input {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+
+        /* Buttons */
+        .btn-container {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .btn-submit {
+            background: var(--primary-blue);
+            color: white;
+            padding: 15px 50px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-family: 'Kantumruy Pro';
+            cursor: pointer;
+        }
+
+        .btn-submit:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        #result-screen {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .score-display {
+            font-size: 48px;
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+
+        @media print {
+            .sticky-status, .btn-container { display: none; }
+            body { background: white; padding: 0; }
+            .exam-paper { box-shadow: none; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="exam-paper">
+    <!-- Header Standard -->
+    <div class="exam-header">
+        <div class="school-info">
+            ព្រះរាជាណាចក្រកម្ពុជា<br>
+            ជាតិ សាសនា ព្រះមហាក្សត្រ
+        </div>
+        <div class="school-info">
+            វិទ្យាល័យចំណេះទូទៅ<br>
+            ឆ្នាំសិក្សា ២០២៣-២០២៤
+        </div>
+    </div>
+
+    <div class="exam-title">
+        <h2>វិញ្ញាសាតេស្ត៖ រូបមន្តត្រីកោណមាត្រ (មេរៀនទី២)</h2>
+        <p>កម្រិតថ្នាក់ទី១១-១២ | រយៈពេល៖ ៥០ នាទី</p>
+    </div>
+
+    <div class="meta-grid">
+        <div>វិញ្ញាសា៖ គណិតវិទ្យា</div>
+        <div>ពិន្ទុសរុប៖ ១០០ ពិន្ទុ</div>
+        <div>ចំនួនសំណួរ៖ ២០ (៥ ពិន្ទុ/សំណួរ)</div>
+        <div style="color: red; font-weight: bold;">* ហាមរំលងសំណួរ</div>
+    </div>
+
+    <!-- Sticky Status -->
+    <div class="sticky-status">
+        <div id="timer" style="font-weight: bold; color: red;">50:00</div>
+        <div class="progress-container">
+            <div id="progress-bar"></div>
+        </div>
+        <div id="progress-text">0/20</div>
+    </div>
+
+    <form id="quizForm">
+        <div id="questions-container"></div>
+        
+        <div class="btn-container">
+            <button type="button" class="btn-submit" id="submitBtn" onclick="validateAndSubmit()">បញ្ជូនវិញ្ញាសា</button>
+        </div>
+    </form>
+
+    <div id="result-screen">
+        <h2>លទ្ធផលនៃការប្រឡង</h2>
+        <div class="score-display" id="score-val">0/100</div>
+        <p id="grade-msg" style="font-size: 20px;"></p>
+        <button onclick="location.reload()" style="margin-top:20px; padding:10px 20px;">ធ្វើឡើងវិញ</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "តើរូបមន្ត \\( \\cos(a + b) \\) ស្មើនឹងអ្វី?", a: "\\( \\cos a \\cos b - \\sin a \\sin b \\)", b: "\\( \\cos a \\cos b + \\sin a \\sin b \\)", c: "\\( \\sin a \\cos b + \\cos a \\sin b \\)", d: "\\( \\sin a \\cos b - \\cos a \\sin b \\)", ans: "a" },
+        { q: "តើរូបមន្ត \\( \\sin(2a) \\) ស្មើនឹងអ្វី?", a: "\\( 2 \\sin a \\)", b: "\\( \\cos^2 a - \\sin^2 a \\)", c: "\\( 2 \\sin a \\cos a \\)", d: "\\( 2 \\cos^2 a \\)", ans: "c" },
+        { q: "តើរូបមន្ត \\( \\cos(2a) \\) ជាអនុគមន៍នៃ \\( \\sin a \\) គឺ៖", a: "\\( 2 \\cos^2 a - 1 \\)", b: "\\( 1 - 2 \\sin^2 a \\)", c: "\\( \\cos^2 a - \\sin^2 a \\)", d: "\\( 2 \\sin a \\cos a \\)", ans: "b" },
+        { q: "តើ \\( \\tan(a + b) \\) ស្មើនឹងអ្វី?", a: "\\( \\frac{\\tan a + \\tan b}{1 - \\tan a \\tan b} \\)", b: "\\( \\frac{\\tan a - \\tan b}{1 + \\tan a \\tan b} \\)", c: "\\( \\frac{\\tan a + \\tan b}{1 + \\tan a \\tan b} \\)", d: "\\( \\tan a + \\tan b \\)", ans: "a" },
+        { q: "តើ \\( \\sin p + \\sin q \\) ស្មើនឹងអ្វី?", a: "\\( 2 \\sin \\frac{p+q}{2} \\cos \\frac{p-q}{2} \\)", b: "\\( 2 \\cos \\frac{p+q}{2} \\sin \\frac{p-q}{2} \\)", c: "\\( 2 \\cos \\frac{p+q}{2} \\cos \\frac{p-q}{2} \\)", d: "\\( -2 \\sin \\frac{p+q}{2} \\sin \\frac{p-q}{2} \\)", ans: "a" },
+        { q: "តើ \\( \\cos p - \\cos q \\) ស្មើនឹងអ្វី?", a: "\\( 2 \\sin \\frac{p+q}{2} \\sin \\frac{q-p}{2} \\)", b: "\\( -2 \\sin \\frac{p+q}{2} \\sin \\frac{p-q}{2} \\)", c: "\\( 2 \\cos \\frac{p+q}{2} \\cos \\frac{p-q}{2} \\)", d: "ចម្លើយ ក និង ខ ត្រឹមត្រូវ", ans: "d" },
+        { q: "តើ \\( 1 + \\tan^2 x \\) ស្មើនឹងអ្វី?", a: "\\( \\frac{1}{\\sin^2 x} \\)", b: "\\( \\frac{1}{\\cos^2 x} \\)", c: "\\( \\cot^2 x \\)", d: "\\( \\cos^2 x \\)", ans: "b" },
+        { q: "តើ \\( \\sin a \\cos b \\) បំប្លែងជាផលបូកស្មើនឹង៖", a: "\\( \\frac{1}{2} [\\sin(a+b) + \\sin(a-b)] \\)", b: "\\( \\frac{1}{2} [\\sin(a+b) - \\sin(a-b)] \\)", c: "\\( \\frac{1}{2} [\\cos(a-b) - \\cos(a+b)] \\)", d: "\\( \\frac{1}{2} [\\cos(a-b) + \\cos(a+b)] \\)", ans: "a" },
+        { q: "តើ \\( \\cos a \\cos b \\) បំប្លែងជាផលបូកស្មើនឹង៖", a: "\\( \\frac{1}{2} [\\cos(a-b) + \\cos(a+b)] \\)", b: "\\( \\frac{1}{2} [\\cos(a-b) - \\cos(a+b)] \\)", c: "\\( \\frac{1}{2} [\\sin(a+b) + \\sin(a-b)] \\)", d: "\\( \\frac{1}{2} [\\sin(a+b) - \\sin(a-b)] \\)", ans: "a" },
+        { q: "តើ \\( \\sin a \\sin b \\) បំប្លែងជាផលបូកស្មើនឹង៖", a: "\\( \\frac{1}{2} [\\cos(a-b) - \\cos(a+b)] \\)", b: "\\( \\frac{1}{2} [\\cos(a+b) - \\cos(a-b)] \\)", c: "\\( \\frac{1}{2} [\\sin(a+b) + \\sin(a-b)] \\)", d: "\\( \\frac{1}{2} [\\sin(a+b) - \\sin(a-b)] \\)", ans: "a" },
+        { q: "តើ \\( \\sin^2 x \\) ស្មើនឹងអ្វី?", a: "\\( \\frac{1 - \\cos 2x}{2} \\)", b: "\\( \\frac{1 + \\cos 2x}{2} \\)", c: "\\( \\frac{1 - \\sin 2x}{2} \\)", d: "\\( 1 - \\cos 2x \\)", ans: "a" },
+        { q: "តើ \\( \\cos^2 x \\) ស្មើនឹងអ្វី?", a: "\\( \\frac{1 - \\cos 2x}{2} \\)", b: "\\( \\frac{1 + \\cos 2x}{2} \\)", c: "\\( 1 + \\cos 2x \\)", d: "\\( \\frac{1 + \\sin 2x}{2} \\)", ans: "b" },
+        { q: "តើ \\( \\tan(2a) \\) ស្មើនឹងអ្វី?", a: "\\( \\frac{2 \\tan a}{1 - \\tan^2 a} \\)", b: "\\( \\frac{2 \\tan a}{1 + \\tan^2 a} \\)", c: "\\( \\frac{\\tan^2 a}{1 - 2 \\tan a} \\)", d: "\\( 2 \\tan a \\)", ans: "a" },
+        { q: "តម្លៃនៃ \\( \\sin \\frac{\\pi}{3} \\) គឺ៖", a: "\\( \\frac{1}{2} \\)", b: "\\( \\frac{\\sqrt{2}}{2} \\)", c: "\\( \\frac{\\sqrt{3}}{2} \\)", d: "\\( 1 \\)", ans: "c" },
+        { q: "តម្លៃនៃ \\( \\cos \\frac{\\pi}{6} \\) គឺ៖", a: "\\( \\frac{1}{2} \\)", b: "\\( \\frac{\\sqrt{3}}{2} \\)", c: "\\( \\frac{\\sqrt{2}}{2} \\)", d: "\\( \\frac{\\sqrt{3}}{3} \\)", ans: "b" },
+        { q: "តើ \\( \\sin(\\frac{\\pi}{2} - x) \\) ស្មើនឹងអ្វី?", a: "\\( \\sin x \\)", b: "\\( -\\sin x \\)", c: "\\( \\cos x \\)", d: "\\( -\\cos x \\)", ans: "c" },
+        { q: "តើ \\( \\cos(\\pi - x) \\) ស្មើនឹងអ្វី?", a: "\\( \\cos x \\)", b: "\\( -\\cos x \\)", c: "\\( \\sin x \\)", d: "\\( -\\sin x \\)", ans: "b" },
+        { q: "តើ \\( \\sin^2 x + \\cos^2 x \\) ស្មើនឹងអ្វី?", a: "\\( 0 \\)", b: "\\( 1 \\)", c: "\\( -1 \\)", d: "\\( 2 \\)", ans: "b" },
+        { q: "តើ \\( \\cot^2 x + 1 \\) ស្មើនឹងអ្វី?", a: "\\( \\frac{1}{\\sin^2 x} \\)", b: "\\( \\frac{1}{\\cos^2 x} \\)", c: "\\( \\tan^2 x \\)", d: "\\( \\sin^2 x \\)", ans: "a" },
+        { q: "តម្លៃនៃ \\( \\tan \\frac{\\pi}{4} \\) គឺ៖", a: "\\( 0 \\)", b: "\\( \\frac{\\sqrt{2}}{2} \\)", c: "\\( 1 \\)", d: "\\( \\sqrt{3} \\)", ans: "c" }
+    ];
+
+    // Render Questions
+    const container = document.getElementById('questions-container');
+    questions.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'question-block';
+        div.innerHTML = `
+            <div class="q-text">
+                <span>${index + 1}. ${item.q}</span>
+                <span class="points-badge">(៥ ពិន្ទុ)</span>
+            </div>
+            <div class="options-grid">
+                <label class="option-item"><input type="radio" name="q${index}" value="a" onchange="updateProgress()"> ក. ${item.a}</label>
+                <label class="option-item"><input type="radio" name="q${index}" value="b" onchange="updateProgress()"> ខ. ${item.b}</label>
+                <label class="option-item"><input type="radio" name="q${index}" value="c" onchange="updateProgress()"> គ. ${item.c}</label>
+                <label class="option-item"><input type="radio" name="q${index}" value="d" onchange="updateProgress()"> ឃ. ${item.d}</label>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+
+    // Progress Tracker
+    function updateProgress() {
+        const answered = document.querySelectorAll('input[type="radio"]:checked').length;
+        const percent = (answered / questions.length) * 100;
+        document.getElementById('progress-bar').style.width = percent + '%';
+        document.getElementById('progress-text').innerText = `${answered}/${questions.length}`;
+    }
+
+    // Timer Logic
+    let timeLeft = 50 * 60;
+    const timerEl = document.getElementById('timer');
+    const timerInterval = setInterval(() => {
+        let m = Math.floor(timeLeft / 60);
+        let s = timeLeft % 60;
+        timerEl.innerText = `${m}:${s < 10 ? '0'+s : s}`;
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            calculateScore();
+        }
+        timeLeft--;
+    }, 1000);
+
+    function validateAndSubmit() {
+        const answered = document.querySelectorAll('input[type="radio"]:checked').length;
+        if (answered < questions.length) {
+            alert("សូមឆ្លើយសំណួរឱ្យបានគ្រប់ចំនួន! អ្នកមិនអាចរំលងលំហាត់ណាមួយបានទេ។");
+            return;
+        }
+        if (confirm("តើអ្នកប្រាកដថាចង់បញ្ជូនចម្លើយមែនទេ?")) {
+            calculateScore();
+        }
+    }
+
+    function calculateScore() {
+        clearInterval(timerInterval);
+        let score = 0;
+        questions.forEach((item, i) => {
+            const selected = document.querySelector(`input[name="q${i}"]:checked`);
+            if (selected && selected.value === item.ans) score += 5;
+        });
+
+        document.getElementById('quizForm').style.display = 'none';
+        document.querySelector('.sticky-status').style.display = 'none';
+        document.querySelector('.meta-grid').style.display = 'none';
+        
+        const resultScreen = document.getElementById('result-screen');
+        resultScreen.style.display = 'block';
+        document.getElementById('score-val').innerText = score + "/100";
+
+        let msg = "";
+        if (score >= 90) msg = "និទ្ទេស A: ល្អប្រសើរណាស់!";
+        else if (score >= 80) msg = "និទ្ទេស B: ល្អណាស់!";
+        else if (score >= 70) msg = "និទ្ទេស C: ល្អ!";
+        else if (score >= 50) msg = "និទ្ទេស D: មធ្យម (ជាប់)";
+        else msg = "និទ្ទេស F: ធ្លាក់ (សូមព្យាយាមម្ដងទៀត)";
+        
+        document.getElementById('grade-msg').innerText = msg;
+        window.scrollTo(0, 0);
+    }
+</script>
+
+</body>
+</html>
